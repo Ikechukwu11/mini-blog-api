@@ -15,7 +15,7 @@ class PostController extends Controller
     {
         try {
             // Retrieve the posts with authors, ordered by latest, paginated
-            $posts = Post::with('author')->latest()->paginate(10);
+            $posts = Post::filter(request(['search', 's']))->latest()->with('author')->paginate(10)->appends(request()->query());
 
             return response()->json([
                 'data' => $posts,

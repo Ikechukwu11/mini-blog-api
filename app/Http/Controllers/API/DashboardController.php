@@ -20,9 +20,7 @@ class DashboardController extends Controller
   // Get all posts for the authenticated user
   public function index()
   {
-    $posts = Post::latest()
-      ->where('user_id', $this->user->id)
-      ->paginate(10); // Adjusted to paginate 10 posts per page
+    $posts = Post::filter(request(['search', 's']))->latest()->where('user_id', $this->user->id)->paginate(10)->appends(request()->query());
 
     return response()->json([
       'data' => $posts,
