@@ -18,6 +18,15 @@
         <h1>My Posts</h1>
         <a class="button" href="{{ route('dashboard.posts.create') }}">New Post</a>
       </div>
+
+      <form style="margin-bottom: 10px">
+        <div class="form-footer" style="flex-wrap: nowrap!important;">
+          <input type="text" placeholder="Enter a search keyword" name="s"
+            value="{{ request()->query('s') ?? request()->query('search')}}">
+          <input type="submit" value="Search">
+        </div>
+
+      </form>
       @if($posts->isEmpty())
       <h3 class="text-error">You have not created any posts yet</h3>
       @endif

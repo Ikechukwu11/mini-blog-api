@@ -18,14 +18,12 @@ class DashboardController extends Controller
   }
   public function index()
   {
-    $posts = Post::latest()->where('user_id', $this->user->id)->paginate(1);
-    // dd($posts->toArray(), $posts->links());
+    $posts = Post::filter(request(['search', 's']))->latest()->where('user_id', $this->user->id)->paginate(10)->appends(request()->query());
     return view('dashboard.index', compact('posts'));
   }
 
   public function create()
   {
-
     return view('dashboard.create');
   }
 

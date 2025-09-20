@@ -12,6 +12,7 @@ Route::get('/login', [AuthController::class, 'showLogin'])->name('login.show');
 Route::get('/register', [AuthController::class, 'showRegister'])->name('register.show');
 Route::post('/login', [AuthController::class, 'login'])->name('login.process');
 Route::post('/register', [AuthController::class, 'register'])->name('register.process');
+Route::get('/logout', [AuthController::class, 'logout'])->name('logout');
 
 Route::middleware('auth')->group(function () {
     Route::prefix('dashboard')->group(function () {

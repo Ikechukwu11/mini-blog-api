@@ -2,62 +2,57 @@
 
 namespace App\Http\Controllers\API;
 
-use App\Http\Controllers\Controller;
-use App\Models\User;
+use App\Models\Post;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Hash;
-use Illuminate\Validation\ValidationException;
+use App\Http\Controllers\Controller;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 
-class AuthController extends Controller
+class PostController extends Controller
 {
-    public function register(Request $request)
+    //All posts.
+
+    public function index()
     {
-        $request->validate([
-            'name' => 'required|string|max:255',
-            'email' => 'required|string|email|unique:users',
-            'password' => 'required|string|min:6|confirmed',
-        ]);
+        try {
+            // Retrieve the posts with authors, ordered by latest, paginated
+            $posts = Post::with('author')->latest()->paginate(10);
 
-        $user = User::create([
-            'name' => $request->name,
-            'email' => $request->email,
-            'password' => Hash::make($request->password),
-        ]);
-
-        $token = $user->createToken('api-token')->plainTextToken;
-
-        return response()->json([
-            'user' => $user,
-            'token' => $token,
-        ], 201);
-    }
-
-    public function login(Request $request)
-    {
-        $request->validate([
-            'email' => 'required|email',
-            'password' => 'required|string',
-        ]);
-
-        $user = User::where('email', $request->email)->first();
-
-        if (! $user || ! Hash::check($request->password, $user->password)) {
-            throw ValidationException::withMessages([
-                'email' => ['The provided credentials are incorrect.'],
-            ]);
+            return response()->json([
+                'data' => $posts,
+                'message' => 'Posts retrieved successfully',
+            ], 200);
+        } catch (\Exception $e) {
+            // Catch any other unexpected errors
+            return response()->json([
+                'message' => 'Something went wrong while retrieving posts.',
+                'error' => $e->getMessage(),
+            ], 500);
         }
-
-        $token = $user->createToken('api-token')->plainTextToken;
-
-        return response()->json([
-            'user' => $user,
-            'token' => $token,
-        ]);
     }
 
-    public function logout(Request $request)
+    //Single Post by id or slug
+    public function show($slug)
     {
-        $request->user()->currentAccessToken()->delete();
-        return response()->json(['message' => 'Logged out']);
+        try {
+            // Retrieve the post by slug
+            $post = Post::where('slug', $slug)->orWhere('id', $slug)->with('author')->firstOrFail();
+
+            return response()->json([
+                'data' => $post,
+                'message' => 'Post retrieved successfully',
+            ], 200);
+        } catch (ModelNotFoundException $e) {
+            // Post not found
+            return response()->json([
+                'message' => 'Post not found',
+                'error' => 'The post with the given slug does not exist.',
+            ], 404);
+        } catch (\Exception $e) {
+            // Catch any other unexpected errors
+            return response()->json([
+                'message' => 'Something went wrong while retrieving the post.',
+                'error' => $e->getMessage(),
+            ], 500);
+        }
     }
 }

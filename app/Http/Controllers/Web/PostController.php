@@ -10,7 +10,7 @@ class PostController extends Controller
 {
     public function index()
     {
-        $posts = Post::with('author')->latest()->paginate(10);
+        $posts = Post::filter(request(['search', 's']))->latest()->with('author')->paginate(10)->appends(request()->query());
         return view('posts.index', compact('posts'));
     }
 

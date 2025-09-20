@@ -9,7 +9,14 @@
 		</style>
 		<div class="posts" style="max-width: 800px">
 			<h1 style="text-align:center">All Posts</h1>
+			<form style="margin-bottom: 10px">
+				<div class="form-footer" style="flex-wrap: nowrap!important;">
+					<input type="text" placeholder="Enter a search keyword" name="s"
+						value="{{ request()->query('s') ?? request()->query('search')}}">
+					<input type="submit" value="Search">
+				</div>
 
+			</form>
 			@if($posts->isEmpty())
 			<h3 class="text-error">No posts yet</h3>
 			@endif
